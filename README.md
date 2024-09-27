@@ -35,33 +35,33 @@ Cache: Time-Based LRU Cache
 Want to set up ThreadWave on your local machine? Here’s how you can get it running in a few easy steps.
 
 Step 1: Clone the Repository
-'''bash
+bash
 
-git clone https://github.com/yourusername/threadwave-proxy-server.git
-cd threadwave-proxy-server'''
+```git clone https://github.com/yourusername/threadwave-proxy-server.git```
+```cd threadwave-proxy-server```
 
 Step 2: Compile the Code
 You'll need GCC to compile the C files. If you don't have it installed, grab it with:
 
 bash
 
-sudo apt-get install gcc
+```sudo apt-get install gcc```
 Now, compile the project:
 
 bash
 
-gcc -pthread -o threadwave server.c client.c
+```gcc -pthread -o threadwave server.c client.c```
 Step 3: Run the Server Locally
 Once compiled, you can start the server on your localhost. Run the following command to launch the proxy server:
 
 bash
 
-./threadwave <PORT_NUMBER>
+```./threadwave <PORT_NUMBER>```
 Example:
 
 bash
 
-./threadwave 8080
+```./threadwave 8080```
 The server is now listening on port 8080 and is ready to accept multiple client connections!
 
 Step 4: Testing the Proxy Server
@@ -69,12 +69,12 @@ To test the server, open a new terminal and run the client program to send reque
 
 bash
 
-./client <SERVER_IP> <PORT_NUMBER>
+```./client <SERVER_IP> <PORT_NUMBER>```
 Example:
 
 bash
 
-./client 127.0.0.1 8080
+```./client 127.0.0.1 8080```
 
 
 The client will now connect to the server and simulate multiple users making requests in parallel. Watch as ThreadWave handles them efficiently!
@@ -98,6 +98,4 @@ If you have any questions or want to chat about the project, feel free to reach 
 
 Happy coding! ✌🏻
 
-```javascript
-// Your code here
-```
+
