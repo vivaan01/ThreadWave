@@ -22,9 +22,10 @@ Integrated a Least Recently Used (LRU) cache to accelerate content delivery and 
 🔧 Tech Stack:
 
 Language: C
-Protocols: TCP, UDP
-Core Concepts: Multithreading, Sockets, System Calls, Mutex, Semaphores
 
+Protocols: TCP, UDP
+
+Core Concepts: Multithreading, Sockets, System Calls, Mutex, Semaphores
 
 Cache: Time-Based LRU Cache
 
@@ -32,47 +33,53 @@ Cache: Time-Based LRU Cache
 🚀 Setup Instructions:
 
 
-Want to set up ThreadWave on your local machine? Here’s how you can get it running in a few easy steps.
+Want to set up ThreadWave on your local machine? 
+Here’s how you can get it running in a few easy steps.
 
 Step 1: Clone the Repository
-bash
+
 
 ```git clone https://github.com/yourusername/threadwave-proxy-server.git```
 ```cd threadwave-proxy-server```
 
 Step 2: Compile the Code
+
 You'll need GCC to compile the C files. If you don't have it installed, grab it with:
 
-bash
+
 
 ```sudo apt-get install gcc```
+
 Now, compile the project:
 
-bash
+
 
 ```gcc -pthread -o threadwave server.c client.c```
+
 Step 3: Run the Server Locally
 Once compiled, you can start the server on your localhost. Run the following command to launch the proxy server:
 
-bash
+
 
 ```./threadwave <PORT_NUMBER>```
+
 Example:
 
-bash
+
 
 ```./threadwave 8080```
+
 The server is now listening on port 8080 and is ready to accept multiple client connections!
 
-Step 4: Testing the Proxy Server
+Step 4: Testing the Proxy Server:
+
 To test the server, open a new terminal and run the client program to send requests:
 
-bash
+
 
 ```./client <SERVER_IP> <PORT_NUMBER>```
-Example:
 
-bash
+Example:
 
 ```./client 127.0.0.1 8080```
 
@@ -80,15 +87,26 @@ bash
 The client will now connect to the server and simulate multiple users making requests in parallel. Watch as ThreadWave handles them efficiently!
 
 🧠 How It Works🧐 :
+
 Multithreading: Each incoming client request is assigned a separate thread, ensuring the server can handle multiple requests concurrently without blocking.
+
+
 Mutex & Semaphores: These are used to synchronize threads and ensure safe access to shared resources like memory and I/O buffers.
+
+
 LRU Cache: Frequently requested data is stored in a time-based cache, so the server can deliver content faster, reducing load on the backend.
-💡 Future Enhancements
+
+💡 Future Enhancements:
+
 Support for HTTPS Protocol
 Enhanced Caching Mechanism (Frequency-Based)
 Load Balancer Integration for Distributed Systems
+
+
 🎉 Contributions
+
 Contributions are welcome! If you find any issues or have ideas for improvement, feel free to open a pull request or submit an issue.
+
 
 📄 License ⚖️
 This project is licensed under the MIT License - see the LICENSE file for details.
