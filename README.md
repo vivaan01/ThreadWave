@@ -35,10 +35,10 @@ Cache: Time-Based LRU Cache
 Want to set up ThreadWave on your local machine? Here’s how you can get it running in a few easy steps.
 
 Step 1: Clone the Repository
-bash
+'''bash
 
 git clone https://github.com/yourusername/threadwave-proxy-server.git
-cd threadwave-proxy-server
+cd threadwave-proxy-server'''
 
 Step 2: Compile the Code
 You'll need GCC to compile the C files. If you don't have it installed, grab it with:
