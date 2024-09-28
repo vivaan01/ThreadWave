@@ -83,6 +83,19 @@ Example:
 
 ```./client 127.0.0.1 8080```
 
+## How to Run
+
+```bash
+$ git clone https://github.com/Lovepreet-Singh-LPSK/MultiThreadedProxyServerClient.git
+$ cd MultiThreadedProxyServerClient
+$ make all
+$ ./proxy <port no.>
+```
+`Open http://localhost:port/https://www.cs.princeton.edu/`
+
+# Note:
+- This code can only be run in Linux Machine. Please disable your browser cache.
+- To run the proxy without cache Change the name of the file (`proxy_server_with_cache.c to proxy_server_without_cache.c`) MakeFile.
 
 The client will now connect to the server and simulate multiple users making requests in parallel. Watch as ThreadWave handles them efficiently!
 
