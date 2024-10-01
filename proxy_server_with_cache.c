@@ -379,3 +379,99 @@ int client_socketId, client_len; // client_socketId == to store the client socke
 		perror("Failed to create socket.\n");
 		exit(1);
 	}
+
+        int reuse =1;
+	if (setsockopt(proxy_socketId, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuse, sizeof(reuse)) < 0) 
+        perror("setsockopt(SO_REUSEADDR) failed\n");
+
+	bzero((char*)&server_addr, sizeof(server_addr));  
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_port = htons(port_number); // Assigning port to the Proxy
+	server_addr.sin_addr.s_addr = INADDR_ANY; // Any available adress assigned
+
+    // Binding the socket
+	if( bind(proxy_socketId, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0 )
+	{
+		perror("Port is not free\n");
+		exit(1);
+	}
+	printf("Binding on port: %d\n",port_number);
+
+    // Proxy socket listening to the requests
+	int listen_status = listen(proxy_socketId, MAX_CLIENTS);
+
+	if(listen_status < 0 )
+	{
+		perror("Error while Listening !\n");
+		exit(1);
+	}
+       int i = 0; // Iterator for thread_id (tid) and Accepted Client_Socket for each thread
+	int Connected_socketId[MAX_CLIENTS];   // This array stores socket descriptors of connected clients
+
+    // Infinite Loop for accepting connections
+	while(1)
+	{
+		
+		bzero((char*)&client_addr, sizeof(client_addr));			// Clears struct client_addr
+		client_len = sizeof(client_addr); 
+
+        // Accepting the connections
+		client_socketId = accept(proxy_socketId, (struct sockaddr*)&client_addr,(socklen_t*)&client_len);	// Accepts connection
+		if(client_socketId < 0)
+		{
+			fprintf(stderr, "Error in Accepting connection !\n");
+			exit(1);
+		}
+		else{
+			Connected_socketId[i] = client_socketId; // Storing accepted client into array
+		}
+
+		// Getting IP address and port number of client
+		struct sockaddr_in* client_pt = (struct sockaddr_in*)&client_addr;
+		struct in_addr ip_addr = client_pt->sin_addr;
+		char str[INET_ADDRSTRLEN];										// INET_ADDRSTRLEN: Default ip address size
+		inet_ntop( AF_INET, &ip_addr, str, INET_ADDRSTRLEN );
+
+               printf("Client is connected with port number: %d and ip address: %s \n",ntohs(client_addr.sin_port), str);
+		//printf("Socket values of index %d in main function is %d\n",i, client_socketId);
+		pthread_create(&tid[i],NULL,thread_fn, (void*)&Connected_socketId[i]); // Creating a thread for each client accepted
+		i++; 
+	}
+	close(proxy_socketId);									// Close socket
+ 	return 0;
+}
+
+cache_element* find(char* url){
+
+// Checks for url in the cache if found returns pointer to the respective cache element or else returns NULL
+    cache_element* site=NULL;
+	//sem_wait(&cache_lock);
+    int temp_lock_val = pthread_mutex_lock(&lock);
+	printf("Remove Cache Lock Acquired %d\n",temp_lock_val); 
+    if(head!=NULL){
+        site = head;
+        while (site!=NULL)
+        {
+            if(!strcmp(site->url,url)){
+				printf("LRU Time Track Before : %ld", site->lru_time_track);
+                printf("\nurl found\n");
+				// Updating the time_track
+				site->lru_time_track = time(NULL);
+				printf("LRU Time Track After : %ld", site->lru_time_track);
+                                    break;
+            }
+            site=site->next;
+        }       
+    }
+	else {
+    printf("\nurl not found\n");
+	}
+	//sem_post(&cache_lock);
+    temp_lock_val = pthread_mutex_unlock(&lock);
+	printf("Remove Cache Lock Unlocked %d\n",temp_lock_val); 
+    return site;
+}
+
+void remove_cache_element(){
+    // If cache is not empty searches for the node which has the least lru_time_track and deletes it
+    cache_element * p ;  	// Cache_element Pointer (Prev. Pointer)
