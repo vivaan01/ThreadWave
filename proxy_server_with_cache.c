@@ -16,45 +16,55 @@
 #include <semaphore.h>
 #include <time.h>
 
-#define MAX_BYTES 4096    //max allowed size of request/response
-#define MAX_CLIENTS 400     //max number of client requests served at a time
-#define MAX_SIZE 200*(1<<20)     //size of the cache
-#define MAX_ELEMENT_SIZE 10*(1<<20)     //max size of an element in cache
 
-typedef struct cache_element cache_element;
+// Constants
+#define MAX_BYTES 4096               // Maximum allowed size of request/response
+#define MAX_CLIENTS 400              // Maximum number of client requests served at a time
+#define MAX_SIZE 200 * (1 << 20)     // Total cache size (200 MB)
+#define MAX_ELEMENT_SIZE 10 * (1 << 20) // Maximum size of a single cache element (10 MB)
 
-struct cache_element{
-    char* data;         //data stores response
-    int len;          //length of data i.e.. sizeof(data)...
-    char* url;        //url stores the request
-	time_t lru_time_track;    //lru_time_track stores the latest time the element is  accesed
-    cache_element* next;    //pointer to next element
-};
+// Struct definition for cache elements
+typedef struct cache_element {
+    char* data;                // Stores the HTTP response
+    int len;                   // Length of the response data
+    char* url;                 // URL (request) corresponding to the response
+    time_t lru_time_track;     // Last accessed time (for LRU caching)
+    struct cache_element* next; // Pointer to the next cache element in the linked list
+} cache_element;
 
-cache_element* find(char* url);
-int add_cache_element(char* data,int size,char* url);
-void remove_cache_element();
+// Function prototypes for cache management
+cache_element* find(char* url);                // Find an element in the cache by URL
+int add_cache_element(char* data, int size, char* url); // Add a new element to the cache
+void remove_cache_element();                   // Remove the least recently used (LRU) cache element
 
-int port_number = 8080;				// Default Port
-int proxy_socketId;					// socket descriptor of proxy server
-pthread_t tid[MAX_CLIENTS];         //array to store the thread ids of clients
-sem_t seamaphore;	                //if client requests exceeds the max_clients this seamaphore puts the
-                                    //waiting threads to sleep and wakes them when traffic on queue decreases
-//sem_t cache_lock;			       
-pthread_mutex_t lock;               //lock is used for locking the cache
+// Proxy server configurations and variables
+int port_number = 8080;        // Default port number for the proxy server
+int proxy_socketId;            // Socket descriptor for the proxy server
+pthread_t tid[MAX_CLIENTS];    // Thread IDs for handling client requests
+sem_t seamaphore;              // Semaphore to limit client requests exceeding MAX_CLIENTS
+pthread_mutex_t lock;          // Mutex lock for protecting the shared cache
 
+// Cache management variables
+cache_element* head = NULL;    // Head of the linked list representing the cache
+int cache_size = 0;            // Current size of the cache
 
-cache_element* head;                //pointer to the cache
-int cache_size;             //cache_size denotes the current size of the cache
+/**
+ * Send an HTTP error message to the client socket.
+ * 
+ * @param socket       Client socket descriptor.
+ * @param status_code  HTTP status code (e.g., 400, 404).
+ * @return 1 on success, -1 on failure.
+ */
+int sendErrorMessage(int socket, int status_code) {
+    char str[1024];
+    char currentTime[50];
+    time_t now = time(0);
 
-int sendErrorMessage(int socket, int status_code)
-{
-	char str[1024];
-	char currentTime[50];
-	time_t now = time(0);
+    // Format current time in HTTP-compatible format
+    struct tm data = *gmtime(&now);
+    strftime(currentTime, sizeof(currentTime), "%a, %d %b %Y %H:%M:%S %Z", &data);
 
-	struct tm data = *gmtime(&now);
-	strftime(currentTime,sizeof(currentTime),"%a, %d %b %Y %H:%M:%S %Z", &data);
+    // Generate error messages based on status code
 
 	switch(status_code)
 {
@@ -91,6 +101,14 @@ case 505: snprintf(str, sizeof(str), "HTTP/1.1 505 HTTP Version Not Supported\r\
 
 	}
 	return 1;
+
+	/**
+ * Establish a connection to the remote server.
+ *
+ * @param host_addr  Remote server hostname or IP address.
+ * @param port_num   Port number to connect to (e.g., 80 for HTTP).
+ * @return Socket descriptor for the remote server, or -1 on failure.
+ */
 }
 int connectRemoteServer(char* host_addr, int port_num)
 {
